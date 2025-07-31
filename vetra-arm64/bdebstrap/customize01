@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# pkgs we need for our kiosk
+chroot $1 apt install -y labwc curl
+
+# Download vetra-player from GitHub
+chroot $1 curl -L -o /tmp/vetra-player.deb "$IGconf_player_release_url"
+if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to download vetra-player from $IGconf_player_release_url"
+    exit 1
+fi
+
+DEB_FILE="$1/tmp/vetra-player.deb"
+if [ -f "$DEB_FILE" ]; then
+    echo "Installing Electron app: $DEB_FILE"
+    chroot $1 apt install -y /tmp/vetra-player.deb
+    rm -f $1/tmp/vetra-player.deb
+
+    # Detect the app executable
+    if echo "$DEB_FILE" | grep -q "vetra-player"; then
+        APP="vetra-player"
+    else
+        APP=$(chroot $1 find /usr/bin /usr/local/bin /opt -name "*vetra*" -type f -executable 2>/dev/null | head -1)
+    fi
+    echo "Detected app executable: $APP"
+else
+    echo "ERROR: No vetra-player.deb found in chroot /tmp directory."
+    exit 1
+fi
+
+# Write out our systemd kiosk service
+cat ../kiosk.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk.service
+
+# Enable the kiosk service so it starts automatically
+$BDEBSTRAP_HOOKS/enable-units "$1" kiosk

@@ -1,0 +1,10 @@
+services:
+    custom-rpi-image:
+        build: .
+        privileged: true
+        stdin_open: true
+        tty: true
+        image: rpi-web-kiosk:latest
+        volumes:
+            - ./vetra-arm64:/home/imagegen/vetra-arm64
+            - ./out:/tmp/vetra-player-arm64/out

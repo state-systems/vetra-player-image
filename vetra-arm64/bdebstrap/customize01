@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# pkgs we need for our kiosk
-chroot $1 apt install -y labwc curl
+# pkgs we need for our kiosk setup
+chroot $1 env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confold" install -y sed grep raspberrypi-sys-mods labwc curl kanshi wlr-randr
 
 # Download vetra-player from GitHub
 chroot $1 curl -L -o /tmp/vetra-player.deb "$IGconf_player_release_url"
@@ -28,12 +28,42 @@ else
     exit 1
 fi
 
-# Write out our systemd kiosk service
-cat ../kiosk.service.tpl | sed \
+# Write out our systemd services
+# First the labwc compositor service
+cat ../labwc.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   > $1/etc/systemd/system/labwc.service
+
+# Then the kanshi output management service
+cat ../kanshi.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   > $1/etc/systemd/system/kanshi.service
+
+# Create kanshi config directory and file
+mkdir -p $1/home/$IGconf_device_user1/.config/kanshi
+cat ../kanshi.config.tpl > $1/home/$IGconf_device_user1/.config/kanshi/config
+chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_device_user1/.config
+
+# Create labwc config directory and file
+mkdir -p $1/home/$IGconf_device_user1/.config/labwc
+cat ../labwc-rc.xml.tpl > $1/home/$IGconf_device_user1/.config/labwc/rc.xml
+chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_device_user1/.config
+
+# Then the kiosk app services
+cat ../kiosk-hdmi0.service.tpl | sed \
    -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
    -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
    -e "s|<KIOSK_APP>|$APP|g" \
-   > $1/etc/systemd/system/kiosk.service
+   > $1/etc/systemd/system/kiosk-hdmi0.service
 
-# Enable the kiosk service so it starts automatically
-$BDEBSTRAP_HOOKS/enable-units "$1" kiosk
+cat ../kiosk-hdmi1.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk-hdmi1.service
+
+# Enable services so they start automatically
+$BDEBSTRAP_HOOKS/enable-units "$1" labwc
+$BDEBSTRAP_HOOKS/enable-units "$1" kanshi

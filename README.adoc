@@ -7,5 +7,5 @@ Small image for Raspberry Pi 5 with the vetra player.
 This image is build using the `rpi-image-gen` tool. To build the image, run:
 
 ```bash
-./build.sh -c generic64-apt-simple -D ./vetra-arm64/ -o ./vetra-arm64/vetra.options
+rpi-image-gen/build.sh -o ~/vetra-arm64/vetra.options -D ~/vetra-arm64/ -c vetra
 ```

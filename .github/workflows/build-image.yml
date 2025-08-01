@@ -2,41 +2,46 @@ name: Build Raspberry Pi Image
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [master, main]
   pull_request:
-    branches: [ master, main ]
+    branches: [master, main]
 
 jobs:
   build-image:
     runs-on: macos-latest
-    
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
-    - name: Create output directory
-      run: mkdir -p out
-      
-    - name: Build Docker image
-      run: docker compose build
-      
-    - name: Run image build process
-      run: |
-        docker compose run --rm custom-rpi-image /bin/bash -c "
-          rpi-image-gen/build.sh -o ~/vetra-arm64/vetra.options -D ~/vetra-arm64/ -c vetra &&
-          cp /home/imagegen/rpi-image-gen/work/vetra-player-arm64/deploy/* /tmp/vetra-player-arm64/out/
-        "
-        
-    - name: List output files
-      run: ls -la out/
-      
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: vetra-player-image-${{ github.sha }}
-        path: out/
-        retention-days: 30
-        if-no-files-found: error
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Start Colima
+        run: |
+          brew install docker docker-compose
+          colima start
+
+          # Verify Docker is working
+          docker info
+
+      - name: Create output directory
+        run: mkdir -p out
+
+      - name: Build Docker image
+        run: docker compose build
+
+      - name: Run image build process
+        run: |
+          docker compose run --rm custom-rpi-image /bin/bash -c "
+            rpi-image-gen/build.sh -o ~/vetra-arm64/vetra.options -D ~/vetra-arm64/ -c vetra &&
+            cp /home/imagegen/rpi-image-gen/work/vetra-player-arm64/deploy/* /tmp/vetra-player-arm64/out/
+          "
+
+      - name: List output files
+        run: ls -la out/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vetra-player-image-${{ github.sha }}
+          path: out/
+          retention-days: 30
+          if-no-files-found: error

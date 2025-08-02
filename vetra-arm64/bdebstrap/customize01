@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# pkgs we need for our kiosk setup
-chroot $1 env DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confold" install -y sed grep raspberrypi-sys-mods labwc curl kanshi wlr-randr
-
 # Download vetra-player from GitHub
 chroot $1 curl -L -o /tmp/vetra-player.deb "$IGconf_player_release_url"
 if [ $? -ne 0 ]; then

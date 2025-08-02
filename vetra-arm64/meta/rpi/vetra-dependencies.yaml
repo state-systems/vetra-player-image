@@ -1,0 +1,13 @@
+---
+name: rpi-vetra-dependencies
+mmdebstrap:
+  packages:
+    - raspi-config
+    - python3
+    - sed
+    - grep
+    - raspberrypi-sys-mods
+    - labwc
+    - curl
+    - kanshi
+    - wlr-randr

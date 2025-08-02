@@ -2,10 +2,12 @@
 
 debian/bookworm/arm64/base-apt
 rpi/debian/bookworm/apt
+rpi/initramfs
 rpi/misc-utils
 rpi/base/essential
 rpi/boot-firmware
 rpi/arm64/linux-image-v8
+rpi/vetra-dependencies
 rpi/user-credentials
 rpi/misc-skel
 sys-apps/systemd-net-min

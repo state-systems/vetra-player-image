@@ -8,4 +8,5 @@ This image is build using the `rpi-image-gen` tool. To build the image, run:
 
 ```bash
 rpi-image-gen/build.sh -o ~/vetra-arm64/vetra.options -D ~/vetra-arm64/ -c vetra
+cp /home/imagegen/rpi-image-gen/work/vetra-player-arm64/deploy/* /tmp/vetra-player-arm64/out
 ```

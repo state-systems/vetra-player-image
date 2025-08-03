@@ -11,3 +11,12 @@ mmdebstrap:
     - curl
     - kanshi
     - wlr-randr
+    - chromium
+    - rpi-chromium-mods
+    - libwidevinecdm0
+    - libgl1-mesa-dri
+    - libgles1
+    - libgles2-mesa
+    - xcompmgr
+    - vulkan-tools
+    - mesa-vulkan-drivers

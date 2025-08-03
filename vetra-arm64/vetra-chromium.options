@@ -1,0 +1,4 @@
+device_hostname=vetra-player
+device_user1=vetra
+image_name=vetra-player-chromium-arm64
+player_chromium=yes

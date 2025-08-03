@@ -1,5 +1,31 @@
 #!/bin/sh
 
+chroot $1 apt install -y locales
+
+# Check if IGconf_player_chromium is set to yes
+if [ "$IGconf_player_chromium" = "yes" ]; then
+
+APP="/usr/bin/chromium-browser https://player.vetra.ch \
+   --kiosk --noerrdialogs --disable-infobars --disable-cursor \
+   --no-first-run --ozone-platform=wayland \
+   --enable-features=OverlayScrollbar --start-maximized \
+   --overscroll-history-navigation=0"
+
+# Create the kiosk app services
+cat ../kiosk-chromium-hdmi0.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk-hdmi0.service
+
+cat ../kiosk-chromium-hdmi1.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk-hdmi1.service
+
+else
+
 # Download vetra-player from GitHub
 chroot $1 curl -L -o /tmp/vetra-player.deb "$IGconf_player_release_url"
 if [ $? -ne 0 ]; then
@@ -25,6 +51,21 @@ else
     exit 1
 fi
 
+# Create the kiosk app services
+cat ../kiosk-hdmi0.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk-hdmi0.service
+
+cat ../kiosk-hdmi1.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<KIOSK_APP>|$APP|g" \
+   > $1/etc/systemd/system/kiosk-hdmi1.service
+
+fi
+
 # Write out our systemd services
 # First the labwc compositor service
 cat ../labwc.service.tpl | sed \
@@ -47,19 +88,6 @@ chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_devic
 mkdir -p $1/home/$IGconf_device_user1/.config/labwc
 cat ../labwc-rc.xml.tpl > $1/home/$IGconf_device_user1/.config/labwc/rc.xml
 chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_device_user1/.config
-
-# Then the kiosk app services
-cat ../kiosk-hdmi0.service.tpl | sed \
-   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
-   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
-   -e "s|<KIOSK_APP>|$APP|g" \
-   > $1/etc/systemd/system/kiosk-hdmi0.service
-
-cat ../kiosk-hdmi1.service.tpl | sed \
-   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
-   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
-   -e "s|<KIOSK_APP>|$APP|g" \
-   > $1/etc/systemd/system/kiosk-hdmi1.service
 
 # Enable services so they start automatically
 $BDEBSTRAP_HOOKS/enable-units "$1" labwc

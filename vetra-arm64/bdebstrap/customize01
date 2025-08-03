@@ -9,7 +9,7 @@ APP="/usr/bin/chromium-browser https://player.vetra.ch \
    --kiosk --noerrdialogs --disable-infobars --disable-cursor \
    --no-first-run --ozone-platform=wayland \
    --enable-features=OverlayScrollbar --start-maximized \
-   --overscroll-history-navigation=0"
+   --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required"
 
 # Create the kiosk app services
 cat ../kiosk-chromium-hdmi0.service.tpl | sed \

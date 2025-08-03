@@ -4,9 +4,16 @@ Small image for Raspberry Pi 5 with the vetra player.
 
 == Build
 
-This image is build using the `rpi-image-gen` tool. To build the image, run:
+This image is build using the `rpi-image-gen` tool. To build the electron image, run:
 
 ```bash
 rpi-image-gen/build.sh -o ~/vetra-arm64/vetra.options -D ~/vetra-arm64/ -c vetra
 cp /home/imagegen/rpi-image-gen/work/vetra-player-arm64/deploy/* /tmp/vetra-player-arm64/out
+```
+
+To build the chromium image run:
+
+```bash
+rpi-image-gen/build.sh -o ~/vetra-arm64/vetra-chromium.options -D ~/vetra-arm64/ -c vetra
+cp /home/imagegen/rpi-image-gen/work/vetra-player-chromium-arm64/deploy/* /tmp/vetra-player-arm64/out
 ```

@@ -20,3 +20,5 @@ mmdebstrap:
     - xcompmgr
     - vulkan-tools
     - mesa-vulkan-drivers
+    - plymouth
+    - plymouth-themes

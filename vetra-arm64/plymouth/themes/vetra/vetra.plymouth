@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=vetra
+Description=A vetra themed splash screen
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/vetra/
+ScriptFile=/usr/share/plymouth/themes/vetra/vetra.script

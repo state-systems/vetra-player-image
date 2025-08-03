@@ -4,6 +4,13 @@ Small image for Raspberry Pi 5 with the vetra player.
 
 == Build
 
+To start the docker environment needed to build the image, run:
+
+```bash
+docker compose build
+docker compose run --rm custom-rpi-image
+```
+
 This image is build using the `rpi-image-gen` tool. To build the electron image, run:
 
 ```bash

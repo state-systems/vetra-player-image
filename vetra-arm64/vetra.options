@@ -1,5 +1,5 @@
 device_hostname=vetra-player
 device_user1=vetra
 image_name=vetra-player-arm64
-player_chromium=yes
+player_chromium=no
 player_release_url=https://github.com/state-systems/vetra-player/releases/download/v0.1.4/vetra-player-0.1.4.deb

@@ -12,7 +12,6 @@ RestartSec=5
 # Wait for displays to be configured
 ExecStartPre=/bin/sleep 3
 ExecStart=<KIOSK_APP> --profile-name hdmi2
-StandardError=tty
-
+StandardError=journal
 [Install]
 WantedBy=default.target

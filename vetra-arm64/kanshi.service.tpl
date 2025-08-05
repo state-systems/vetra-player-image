@@ -10,7 +10,7 @@ Environment="XDG_RUNTIME_DIR=<KIOSK_RUNDIR>"
 Restart=always
 RestartSec=2
 ExecStart=/usr/bin/kanshi
-StandardError=tty
+StandardError=journal
 
 [Install]
 WantedBy=default.target

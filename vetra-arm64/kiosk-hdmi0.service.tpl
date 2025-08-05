@@ -9,10 +9,8 @@ Environment="XDG_RUNTIME_DIR=<KIOSK_RUNDIR>"
 Environment="DISPLAY=:0.0"
 Restart=always
 RestartSec=5
-# Wait for displays to be configured
-ExecStartPre=/bin/sleep 3
 ExecStart=<KIOSK_APP> --profile-name hdmi1
-StandardError=tty
+StandardError=journal
 
 [Install]
 WantedBy=default.target

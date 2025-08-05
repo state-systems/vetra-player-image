@@ -7,12 +7,12 @@ Requires=labwc.service kanshi.service
 User=<KIOSK_USER>
 Environment="XDG_RUNTIME_DIR=<KIOSK_RUNDIR>"
 Environment="DISPLAY=:0.0"
+Environment="XDG_CONFIG_HOME=<KIOSK_RUNDIR>/.config/hdmi0"
+Environment="XDG_CACHE_HOME=<KIOSK_RUNDIR>/.cache/hdmi0"
 Restart=always
 RestartSec=5
-# Wait for displays to be configured
-ExecStartPre=/bin/sleep 3
-ExecStart=<KIOSK_APP> --profile-directory <KIOSK_RUNDIR>/.config/chromium/hdmi0
-StandardError=tty
+ExecStart=<KIOSK_APP>
+StandardError=journal
 
 [Install]
 WantedBy=default.target

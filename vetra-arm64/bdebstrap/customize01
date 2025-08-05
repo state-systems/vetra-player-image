@@ -2,6 +2,8 @@
 
 chroot $1 apt install -y locales
 
+chroot $1 rfkill block bluetooth
+
 # Check if IGconf_player_chromium is set to yes
 if [ "$IGconf_player_chromium" = "yes" ]; then
 
@@ -9,7 +11,7 @@ APP="/usr/bin/chromium-browser https://player.vetra.ch \
    --kiosk --noerrdialogs --disable-infobars --disable-cursor \
    --no-first-run --ozone-platform=wayland \
    --enable-features=OverlayScrollbar --start-maximized \
-   --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required"
+   --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required \ --chrome-flags=\"--disable-features=Translate --disable-features=OverscrollHistoryNavigation\""   
 
 # Create the kiosk app services
 cat ../kiosk-chromium-hdmi0.service.tpl | sed \

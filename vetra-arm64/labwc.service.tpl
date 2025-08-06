@@ -7,6 +7,7 @@ Before=kanshi.service kiosk-hdmi0.service kiosk-hdmi1.service
 User=<KIOSK_USER>
 TTYPath=/dev/tty1
 Environment="XDG_RUNTIME_DIR=<KIOSK_RUNDIR>"
+Environment="XDG_DATA_DIRS=/usr/local/share:/usr/share"
 Restart=always
 RestartSec=2
 ExecStart=/usr/bin/labwc

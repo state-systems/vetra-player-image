@@ -22,3 +22,4 @@ mmdebstrap:
     - mesa-vulkan-drivers
     - plymouth
     - plymouth-themes
+    - swaybg

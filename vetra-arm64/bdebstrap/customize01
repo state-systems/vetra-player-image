@@ -4,7 +4,6 @@ chroot $1 apt install -y locales
 
 chroot $1 rfkill block bluetooth
 
-# Check if IGconf_player_chromium is set to yes
 if [ "$IGconf_player_chromium" = "yes" ]; then
 
 APP="/usr/bin/chromium-browser https://player.vetra.ch \
@@ -89,6 +88,7 @@ chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_devic
 # Create labwc config directory and file
 mkdir -p $1/home/$IGconf_device_user1/.config/labwc
 cat ../labwc-rc.xml.tpl > $1/home/$IGconf_device_user1/.config/labwc/rc.xml
+cat ../labwc-autostart.tpl > $1/home/$IGconf_device_user1/.config/labwc/autostart
 chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_device_user1/.config
 
 # Enable services so they start automatically

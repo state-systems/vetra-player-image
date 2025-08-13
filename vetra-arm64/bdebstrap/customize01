@@ -1,14 +1,16 @@
 #!/bin/sh
 
-chroot $1 apt install -y locales
+set -eu
 
-chroot $1 rfkill block bluetooth
+echo "en_US.UTF-8 UTF-8" > $1/etc/locale.gen
+
+chroot $1 apt install -y locales
 
 if [ "$IGconf_player_chromium" = "yes" ]; then
 
 APP="/usr/bin/chromium-browser https://player.vetra.ch \
    --kiosk --noerrdialogs --disable-infobars --disable-cursor \
-   --no-first-run --ozone-platform=wayland \
+   --no-first-run --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 \
    --enable-features=OverlayScrollbar --start-maximized \
    --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required \ --chrome-flags=\"--disable-features=Translate --disable-features=OverscrollHistoryNavigation\""   
 
@@ -80,6 +82,12 @@ cat ../kanshi.service.tpl | sed \
    -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
    > $1/etc/systemd/system/kanshi.service
 
+# Finally the squeekboard virtual keyboard service
+cat ../squeekboard.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   > $1/etc/systemd/system/squeekboard.service
+
 # Create kanshi config directory and file
 mkdir -p $1/home/$IGconf_device_user1/.config/kanshi
 cat ../kanshi.config.tpl > $1/home/$IGconf_device_user1/.config/kanshi/config
@@ -91,6 +99,22 @@ cat ../labwc-rc.xml.tpl > $1/home/$IGconf_device_user1/.config/labwc/rc.xml
 cat ../labwc-autostart.tpl > $1/home/$IGconf_device_user1/.config/labwc/autostart
 chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /home/$IGconf_device_user1/.config
 
+# Customize NetworkManager-wait-online.service timeout
+if [ -f "$1/lib/systemd/system/NetworkManager-wait-online.service" ]; then
+    sed -i 's/Environment=NM_ONLINE_TIMEOUT=60/Environment=NM_ONLINE_TIMEOUT=15/' "$1/lib/systemd/system/NetworkManager-wait-online.service"
+fi
+
+# Customize systemd-networkd-wait-online.service timeout
+if [ -f "$1/lib/systemd/system/systemd-networkd-wait-online.service" ]; then
+    sed -i 's|ExecStart=/lib/systemd/systemd-networkd-wait-online|ExecStart=/lib/systemd/systemd-networkd-wait-online --timeout=15|' "$1/lib/systemd/system/systemd-networkd-wait-online.service"
+fi
+
 # Enable services so they start automatically
 $BDEBSTRAP_HOOKS/enable-units "$1" labwc
 $BDEBSTRAP_HOOKS/enable-units "$1" kanshi
+$BDEBSTRAP_HOOKS/enable-units "$1" squeekboard
+
+# Enable network manager wait online service
+$BDEBSTRAP_HOOKS/enable-units "$1" NetworkManager-wait-online.service
+
+

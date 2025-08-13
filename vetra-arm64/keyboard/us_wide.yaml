@@ -1,0 +1,59 @@
+---
+outlines:
+    default: { width: 54, height: 42 }
+    altline: { width: 81, height: 42 }
+    wide: { width: 108, height: 42 }
+    spaceline: { width: 216, height: 42 }
+    special: { width: 54, height: 42 }
+
+views:
+    base:
+        - "q w e r t z u i o p"
+        - "a s d f g h j k l"
+        - "Shift_L   y x c v b n m @  BackSpace"
+        - "show_numbers         space        . Return"
+    upper:
+        - "Q W E R T Z U I O P"
+        - "A S D F G H J K L"
+        - "Shift_L   Y X C V B N M @  BackSpace"
+        - "show_numbers         space        . Return"
+    numbers:
+        - "1 2 3 4 5 6 7 8 9 0"
+        - "@ # $ % & - _ + ( )"
+        - ", \" ' colon ; ! ?  BackSpace"
+        - "show_letters         space        . Return"
+
+buttons:
+    Shift_L:
+        action:
+            locking:
+                lock_view: "upper"
+                unlock_view: "base"
+        outline: "altline"
+        icon: "go-up-symbolic"
+    BackSpace:
+        outline: "altline"
+        icon: "edit-clear-symbolic"
+        action: "erase"
+    show_numbers:
+        action:
+            set_view: "numbers"
+        outline: "wide"
+        label: "123"
+    show_letters:
+        action:
+            set_view: "base"
+        outline: "wide"
+        label: "ABC"
+    ".":
+        outline: "special"
+        text: "."
+    space:
+        outline: "spaceline"
+        text: " "
+    Return:
+        outline: "wide"
+        icon: "object-select-symbolic"
+        keysym: "Return"
+    colon:
+        text: ":"

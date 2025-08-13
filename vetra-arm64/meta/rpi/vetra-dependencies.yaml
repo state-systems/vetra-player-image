@@ -6,6 +6,7 @@ mmdebstrap:
     - python3
     - sed
     - grep
+    - git
     - raspberrypi-sys-mods
     - labwc
     - curl

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+chroot $1 git clone https://github.com/state-systems/squeekboard.git /tmp/squeekboard
+chroot $1 bash -c "cd /tmp/squeekboard && apt-get build-dep . -y && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . \"$HOME/.cargo/env\" && rustup update && mkdir _build && meson _build && cd _build && ninja install && rustup self uninstall -y"
+
+# Clean up the temporary directory and uninstall build dependencies
+chroot $1 apt-get remove --purge -y $(chroot $1 apt-mark showmanual | grep -E 'meson|ninja|rustc|cargo|git')
+chroot $1 apt-get autoremove --purge -y
+chroot $1 rm -rf /tmp/squeekboard
+
+chroot $1 mkdir -p /etc/xdg/autostart
+
+chroot $1 apt install -y squeekboard
+
+cp ../keyboard/us_wide.yaml $1/usr/share/misc/squeekboard/keyboards/us_wide.yaml

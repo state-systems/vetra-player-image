@@ -1,7 +1,8 @@
 [Unit]
 Description=vetra player kiosk app HDMI 1
-After=multi-user.target labwc.service kanshi.service
+After=multi-user.target labwc.service kanshi.service network-online.target
 Requires=labwc.service kanshi.service
+Wants=network-online.target
 
 [Service]
 User=<KIOSK_USER>

@@ -2,7 +2,6 @@
 
 set -eu
 
-
 # Disable getty on tty1
 ln -sf "/dev/null" "$1/etc/systemd/system/getty@tty1.service"
 

@@ -24,3 +24,6 @@ mmdebstrap:
     - plymouth
     - plymouth-themes
     - swaybg
+    - libssl-dev
+    - grim
+    - libnss3-tools

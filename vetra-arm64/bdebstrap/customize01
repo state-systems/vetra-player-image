@@ -8,23 +8,27 @@ chroot $1 apt install -y locales
 
 if [ "$IGconf_player_chromium" = "yes" ]; then
 
-APP="/usr/bin/chromium-browser https://player.vetra.ch \
+APP="/usr/bin/chromium-browser $IGconf_player_url<OPTIONS> \
    --kiosk --noerrdialogs --disable-infobars --disable-cursor \
    --no-first-run --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 \
    --enable-features=OverlayScrollbar --start-maximized \
    --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required \ --chrome-flags=\"--disable-features=Translate --disable-features=OverscrollHistoryNavigation\""   
 
+# replace options placeholder with actual options
+APP_HDMI0=$(echo $APP | sed "s|<OPTIONS>|?output=HDMI-A-1|g")
+APP_HDMI1=$(echo $APP | sed "s|<OPTIONS>|?output=HDMI-A-2|g")
+
 # Create the kiosk app services
 cat ../kiosk-chromium-hdmi0.service.tpl | sed \
    -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
    -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
-   -e "s|<KIOSK_APP>|$APP|g" \
+   -e "s|<KIOSK_APP>|$APP_HDMI0|g" \
    > $1/etc/systemd/system/kiosk-hdmi0.service
 
 cat ../kiosk-chromium-hdmi1.service.tpl | sed \
    -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
    -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
-   -e "s|<KIOSK_APP>|$APP|g" \
+   -e "s|<KIOSK_APP>|$APP_HDMI1|g" \
    > $1/etc/systemd/system/kiosk-hdmi1.service
 
 else
@@ -88,6 +92,31 @@ cat ../squeekboard.service.tpl | sed \
    -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
    > $1/etc/systemd/system/squeekboard.service
 
+# Setup vetra file server
+mkdir -p $1/opt/vetra/fileserver
+cat ../fileserver/server.py.tpl | sed \
+   -e "s|<PLAYER_URL>|$IGconf_player_url|g" \
+   > $1/opt/vetra/fileserver/server.py
+
+# Create the vetra fileserver service
+cat ../vetra-fileserver.service.tpl > $1/etc/systemd/system/vetra-fileserver.service
+
+# Setup vetra device agent
+mkdir -p $1/opt/vetra/device-agent
+cp ../vetra-device-agent $1/opt/vetra/device-agent/
+
+# Create the vetra device agent service
+cat ../vetra-device-agent.service.tpl | sed \
+   -e "s|<KIOSK_USER>|$IGconf_device_user1|g" \
+   -e "s|<KIOSK_RUNDIR>|\/home\/$IGconf_device_user1|g" \
+   -e "s|<APP_URL>|$IGconf_app_url|g" \
+   -e "s|<JWT_ISSUER>|$IGconf_jwt_issuer|g" \
+   > $1/etc/systemd/system/vetra-device-agent.service
+
+# Set permissions on /opt/vetra folder recursively
+chroot $1 chown -R $IGconf_device_user1:$IGconf_device_user1 /opt/vetra
+chroot $1 chmod -R 755 /opt/vetra
+
 # Create kanshi config directory and file
 mkdir -p $1/home/$IGconf_device_user1/.config/kanshi
 cat ../kanshi.config.tpl > $1/home/$IGconf_device_user1/.config/kanshi/config
@@ -113,6 +142,8 @@ fi
 $BDEBSTRAP_HOOKS/enable-units "$1" labwc
 $BDEBSTRAP_HOOKS/enable-units "$1" kanshi
 $BDEBSTRAP_HOOKS/enable-units "$1" squeekboard
+$BDEBSTRAP_HOOKS/enable-units "$1" vetra-fileserver
+$BDEBSTRAP_HOOKS/enable-units "$1" vetra-device-agent
 
 # Enable network manager wait online service
 $BDEBSTRAP_HOOKS/enable-units "$1" NetworkManager-wait-online.service

@@ -10,7 +10,7 @@ Environment="DISPLAY=:0.0"
 Restart=always
 RestartSec=5
 # Wait for displays to be configured
-ExecStartPre=/bin/sleep 3
+ExecStartPre=/bin/sleep 6
 ExecStart=<KIOSK_APP> --profile-name hdmi2
 StandardError=journal
 [Install]

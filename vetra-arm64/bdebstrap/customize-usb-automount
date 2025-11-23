@@ -1,0 +1,38 @@
+#!/bin/sh
+
+set -eu
+
+echo "Setting up USB auto-mount configuration..."
+
+# Create the mount point directory
+mkdir -p $1/mnt/vetra/dev
+
+# Create udev rule for USB auto-mounting
+cat > $1/etc/udev/rules.d/99-usb-automount.rules << 'EOF'
+# Auto-mount USB storage devices to /mnt/vetra/dev
+# Only mount USB storage device partitions
+ACTION=="add", KERNEL=="sd[a-z][0-9]*", SUBSYSTEM=="block", ATTRS{removable}=="1", \
+    ENV{ID_FS_USAGE}=="filesystem", \
+    ENV{DEVTYPE}=="partition", \
+    ENV{ID_BUS}=="usb", \
+    RUN+="/bin/systemd-run --no-block /usr/local/bin/usb-mount.sh %k"
+
+ACTION=="remove", KERNEL=="sd[a-z][0-9]*", SUBSYSTEM=="block", ATTRS{removable}=="1", \
+    ENV{ID_BUS}=="usb", \
+    RUN+="/usr/local/bin/usb-unmount.sh %k"
+EOF
+
+# Copy the mount and unmount scripts from fileserver folder
+cp ../fileserver/usb-mount.sh $1/usr/local/bin/usb-mount.sh
+cp ../fileserver/usb-unmount.sh $1/usr/local/bin/usb-unmount.sh
+
+# Make scripts executable
+chmod +x $1/usr/local/bin/usb-mount.sh
+chmod +x $1/usr/local/bin/usb-unmount.sh
+
+# Create a fallback mount directory with some content for testing
+mkdir -p $1/mnt/vetra/dev
+chmod 755 $1/mnt/vetra/dev
+# Don't set ownership here - let the mount script handle it
+
+echo "USB auto-mount configuration completed successfully."

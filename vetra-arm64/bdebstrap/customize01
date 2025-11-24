@@ -12,7 +12,8 @@ APP="/usr/bin/chromium-browser $IGconf_player_url<OPTIONS> \
    --kiosk --noerrdialogs --disable-infobars --disable-cursor \
    --no-first-run --ozone-platform=wayland --enable-wayland-ime --wayland-text-input-version=3 \
    --enable-features=OverlayScrollbar --start-maximized \
-   --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required \ --chrome-flags=\"--disable-features=Translate --disable-features=OverscrollHistoryNavigation\""   
+   --overscroll-history-navigation=0 --autoplay-policy=no-user-gesture-required \ 
+   --disable-features=Translate,OverscrollHistoryNavigation,LocalNetworkAccessCheck,LocalNetworkAccessChecks"   
 
 # replace options placeholder with actual options
 APP_HDMI0=$(echo $APP | sed "s|<OPTIONS>|?output=HDMI-A-1|g")
